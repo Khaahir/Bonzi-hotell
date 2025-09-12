@@ -52,17 +52,25 @@ User stories nedbrutna till tasks
 • Validera antal gäster och rum
 • Spara bokning i DynamoDB
 • Returnera boknings-ID
+
+
 2. Få bekräftelse
 • Returnera bokningsinfo efter POST
 • Visa boknings-ID, rum, pris
+
+
 3. Ändra bokning
 • Skapa PUT /bookings/{id}
 • Validera nya uppgifter
 • Uppdatera bokning i DynamoDB
+
+
 4. Avboka rum
 • Skapa DELETE /bookings/{id}
 • Kontrollera om bokning finns
 • Ta bort från DynamoDB
+
+
 5. Se alla bokningar
 • Skapa GET /bookings
 • Hämta alla bokningar från Dyn
