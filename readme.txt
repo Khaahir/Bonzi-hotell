@@ -1,0 +1,68 @@
+Gruppexamination: Bonz.ai
+Bakgrund
+Bonz.ai, företaget bakom hotellet, har alltid strävat efter att vara i framkant när det gäller att
+använda teknik för att förbättra kundupplevelsen. De har en stark kultur av innovation och är inte
+rädda för att tänka utanför boxen. Ni har blivit anlitade för att bygga deras boknings-API baserat på
+en serverless arkitektur i AWS.
+
+
+Varför serverless och DynamoDB?
+- Serverless gör att ni slipper hantera servrar och kan fokusera på applikationen. - Skalning sker
+automatiskt efter efterfrågan. - DynamoDB används för att lagra bokningsinformation och erbjuder
+snabb prestanda med automatisk skalning.
+
+
+
+Instruktioner
+1. En gruppmedlem skapar ett repo och bjuder in övriga. 2. Under fliken Projects – välj nytt projekt
+och kopiera över alla user stories. 3. Dela upp user stories i tekniska tasks. 4. Ingen inloggning eller
+konto krävs.
+User Stories
+Se: https://github.com/orgs/JS22-backend-fordjupning/projects/2/views/1
+Affärslogik
+• Totalt 20 rum på hotellet.
+• Tre typer av rum:
+• - Enkelrum: 1 gäst, 500 kr/natt
+• - Dubbelrum: 2 gäster, 1000 kr/natt
+• - Svit: 3 gäster, 1500 kr/natt
+• Olika typer av rum kan kombineras men antalet gäster måste stämma med logiken.
+Tekniska krav
+• Serverless framework
+• API Gateway
+• AWS Lambda
+• DynamoDB
+• Felhantering mot DynamoDB och vid ogiltiga värden i body
+Betygskriterier
+
+
+För Godkänt:
+• Uppfyller alla krav i kravspecifikationen
+• Uppfyller alla tekniska krav
+Handledning
+Handledning erbjuds tisdag, torsdag och fredag på Discord via en handledningstråd.
+Inlämning
+Inlämning sker på Azomo med: - Länk till Github-repo - Länk till inspelning där projektet gås igenom
+Deadline: Fredag 19/9 kl 23:59. Alla gruppmedlemmar måste lämna in.
+
+
+
+User stories nedbrutna till tasks
+1. Boka rum
+• Skapa POST /bookings
+• Validera antal gäster och rum
+• Spara bokning i DynamoDB
+• Returnera boknings-ID
+2. Få bekräftelse
+• Returnera bokningsinfo efter POST
+• Visa boknings-ID, rum, pris
+3. Ändra bokning
+• Skapa PUT /bookings/{id}
+• Validera nya uppgifter
+• Uppdatera bokning i DynamoDB
+4. Avboka rum
+• Skapa DELETE /bookings/{id}
+• Kontrollera om bokning finns
+• Ta bort från DynamoDB
+5. Se alla bokningar
+• Skapa GET /bookings
+• Hämta alla bokningar från Dyn
