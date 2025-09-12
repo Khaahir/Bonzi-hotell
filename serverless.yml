@@ -6,6 +6,7 @@ service: BonzaiHotell
 provider:
   name: aws
   runtime: nodejs20.x
+  region: eu-north-1
   # Uncomment to easily set up a custom domain. Read the docs for more details:
   # https://www.serverless.com/framework/docs/providers/aws/guide/domains
   # domain: api.example.com
@@ -38,3 +39,22 @@ functions:
       - httpApi:
           path: /see
           method: get      
+
+
+resources:
+  Resources:
+    Js24Todo:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: Bonzai-BonzaiHotell
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: pk
+            AttributeType: S
+          - AttributeName: sk
+            AttributeType: S
+        KeySchema:
+          - AttributeName: pk
+            KeyType: HASH          # partition key
+          - AttributeName: sk
+            KeyType: RANGE    
