@@ -1,11 +1,22 @@
 import { v4 as uuid } from "uuid";
+import { validateBody } from "../../validate/validateBooking";
+
+
+const price = { single: 500, double: 1000, suite: 1500 };
+
+const respond = (code, data) => ({
+  statusCode: code,
+  headers: { "content-type": "application/json" },
+  body: JSON.stringify(data),
+});
 
 export const handler = async (event) => {
   try {
     const body = JSON.parse(event.body || "{}");
-    validateBody(body);
+    const validate = validateBody(body)
+    if(!validate.ok) return respond(validate.statusCode, { message: validate.message })
 
-    const rooms = buildPlan(body.guests, body.rooms);
+    /* const rooms = buildPlan(body.guests, body.rooms); */
     const totalPrice = price(rooms);
 
     const id = uuid();
@@ -25,29 +36,22 @@ export const handler = async (event) => {
     await put(item);
     await putIndex({ id, createdAt: now, guests: body.guests, totalPrice });
 
-    return {
-      statusCode: 201,
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        id,
-        createdAt: now,
-        guests: body.guests,
-        rooms,
-        totalPrice,
-        customer: body.customer,
-        confirmation: {
-          currency: "SEK",
-          items: reciept(rooms),
-          total: totalPrice,
-        },
-      }),
-    };
+    return respond(201,{
+    id,
+    createdAt: now,
+    guests: body.guests,
+    rooms,
+    totalPrice,
+    customer: body.customer,
+    confirmation: {
+        currency: "SEK",
+        items: reciept(rooms),
+        total: totalPrice,
+    },
+        }),
+
   } catch (err) {
-    return {
-      statusCode: err.statusCode || 500,
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ message: err.message }),
-    };
+    return respond(err.statusCode || 500, { message: err.message || "internt feö" })
   }
 };
 // kvitto
