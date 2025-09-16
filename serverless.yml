@@ -6,14 +6,55 @@ service: BonzaiHotell
 provider:
   name: aws
   runtime: nodejs20.x
+  region: eu-north-1
   # Uncomment to easily set up a custom domain. Read the docs for more details:
   # https://www.serverless.com/framework/docs/providers/aws/guide/domains
   # domain: api.example.com
 
 functions:
-  hello:
-    handler: handler.hello
+  AddRoom:
+    handler: functions/AddRoom/index.handler
     events:
       - httpApi:
-          path: /
-          method: get
+          path: /add
+          method: post
+
+  CancelBooking:
+    handler: functions/CancelBooking/index.handler
+    events:
+      - httpApi:
+          path: /cancel
+          method: delete
+
+  ChangeBooking:
+    handler: functions/ChangeBooking/index.handler
+    events:
+      - httpApi:
+          path: /change
+          method: put
+
+  AllBooking:
+    handler: functions/AllBooking/index.handler
+    events:
+      - httpApi:
+          path: /see
+          method: get      
+
+
+resources:
+  Resources:
+    Js24Todo:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: Bonzai-BonzaiHotell
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: pk
+            AttributeType: S
+          - AttributeName: sk
+            AttributeType: S
+        KeySchema:
+          - AttributeName: pk
+            KeyType: HASH          # partition key
+          - AttributeName: sk
+            KeyType: RANGE    
