@@ -16,7 +16,7 @@ const respond = (code, data) => ({
 });
 
 const calcTotalPrice = (rooms) =>
-  rooms.reduce((sum, type) => sum + price[type], 0);
+  rooms.reduce((acc, type) => acc + price[type], 0);
 
 // Kvitto
 const receipt = (rooms) => {
