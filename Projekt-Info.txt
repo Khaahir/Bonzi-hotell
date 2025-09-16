@@ -74,3 +74,28 @@ User stories nedbrutna till tasks
 5. Se alla bokningar
 • Skapa GET /bookings
 • Hämta alla bokningar från Dyn
+
+
+
+
+Gruppen:
+KENT, arbetar med ALLBOOKING function
+ROBIN arbetar med ADDROOM function
+JESPER arbetar med serverless & CANCELBOOKING
+
+
+Vad har vi gjort?
+
+Måndag: samlades skaffa en struktur för projektet samt tog på oss uppgifter för dagen
+
+
+Tisdag:
+
+
+Onsdag:
+
+
+Torsdag:
+
+
+Fredag:
