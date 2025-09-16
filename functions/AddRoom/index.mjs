@@ -1,8 +1,8 @@
 import { v4 as uuid } from "uuid";
 import { validateBody } from "../../validate/validateBooking";
-import { DynamoDBClient, PutItemCommand } from "@aws-sdk/client-dynamodb"
+import { PutItemCommand } from "@aws-sdk/client-dynamodb"
+import { client } from "../../service/db.mjs";
 
-const client = new DynamoDBClient({});
 
 
 const TABLE_NAME = "Bonzai-BonzaiHotell"; // hämta rätt table name från serverless filen ? 
