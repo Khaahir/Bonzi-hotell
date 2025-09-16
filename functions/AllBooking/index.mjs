@@ -3,7 +3,7 @@ import { DynamoDBDocumentClient, QueryCommand, GetCommand } from "@aws-sdk/lib-d
 import { client } from "../../service/db.mjs";
 
 const ddb = DynamoDBDocumentClient.from(client);
-const TABLE_NAME = process.env.TABLE_NAME;
+const TABLE_NAME = "BonzaiHotell"
 
 const ROOM_CAPACITY = { single: 1, double: 2, suite: 3 };
 

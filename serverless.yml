@@ -6,23 +6,8 @@ provider:
   runtime: nodejs20.x
   region: eu-north-1
   stage: dev
-  role: arn:aws:iam::435830281389:role/LamndaAccses
+  role: arn:aws:iam::435830281389:role/bonzaiHotellFull
 
-  environment:
-    TABLE_NAME: ${self:service}-${sls:stage}-main
-    AWS_NODEJS_CONNECTION_REUSE_ENABLED: "1"
-
-
-  iamRoleStatements:
-    - Effect: Allow
-      Action:
-        - dynamodb:PutItem
-        - dynamodb:GetItem
-        - dynamodb:Query
-        - dynamodb:UpdateItem
-        - dynamodb:DeleteItem
-      Resource:
-        - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${self:provider.environment.TABLE_NAME}
 
 functions:
   AddRoom:
@@ -58,8 +43,7 @@ resources:
     BookingTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ${self:provider.environment.TABLE_NAME}
-        BillingMode: PAY_PER_REQUEST
+        TableName: BonzaiHotell
         AttributeDefinitions:
           - AttributeName: PK
             AttributeType: S
@@ -70,3 +54,5 @@ resources:
             KeyType: HASH
           - AttributeName: SK
             KeyType: RANGE
+        BillingMode: PAY_PER_REQUEST
+            
