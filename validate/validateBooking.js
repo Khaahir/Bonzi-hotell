@@ -1,3 +1,8 @@
+/// namn i databasen för rymstyp "single, double, suite" ist för roomid ?
+
+// idt blir room#single ? room#double osv ? 
+
+
 const CAPACITY = { single: 1, double: 2, suite: 3 };
 const ALLOWED_ROOM_TYPES = new Set(Object.keys(CAPACITY));
 

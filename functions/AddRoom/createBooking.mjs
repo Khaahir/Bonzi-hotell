@@ -5,7 +5,7 @@ import { DynamoDBClient, PutItemCommand } from "@aws-sdk/client-dynamodb"
 const client = new DynamoDBClient({});
 
 
-const TABLE_NAME = process.env.BOOKINGS_TABLE;
+const TABLE_NAME = process.env.BOOKINGS_TABLE; // hämta rätt table name från serverless filen ? 
 
 const price = { single: 500, double: 1000, suite: 1500 };
 
@@ -50,7 +50,7 @@ export const handler = async (event) => {
 
   const bookingItem = {
       PK: { S: `BOOKING#${id}` },
-      SK: { S: `BOOKING#${id}` }, // måste byta namn här. vad ska vara sort keyn=?
+      SK: { S: `BOOKING#${id}` }, // måste byta namn här. vad ska vara sort key???
       entityType: { S: "BOOKING" },
       id: { S: id },
       createdAt: { S: now },
@@ -102,6 +102,6 @@ export const handler = async (event) => {
         })
 
   } catch (err) {
-    return respond(err.statusCode || 500, { message: err.message || "internt feö" })
+    return respond(err.statusCode || 500, { message: err.message || "internt fel" })
   }
 };
