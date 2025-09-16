@@ -50,7 +50,7 @@ export const handler = async (event) => {
 
   const bookingItem = {
       PK: { S: `BOOKING#${id}` },
-      SK: { S: `BOOKING#${id}` },
+      SK: { S: `BOOKING#${id}` }, // måste byta namn här. vad ska vara sort keyn=?
       entityType: { S: "BOOKING" },
       id: { S: id },
       createdAt: { S: now },
