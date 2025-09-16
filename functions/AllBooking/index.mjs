@@ -1,4 +1,4 @@
-import {Client } from "@aws-sdk/client-dynamodb";
+import { client } from "../../service/db.mjs";
 import { Client, ScanCommand, GetCommand, BatchGetCommand } from "@aws-sdk/lib-dynamodb";
 
 

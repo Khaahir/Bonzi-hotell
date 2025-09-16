@@ -34,7 +34,7 @@ functions:
           method: put
 
   AllBooking:
-    handler: functions/AllBooking/index.handler
+    handler: functions/AllBooking/index.getAllBookings
     events:
       - httpApi:
           path: /see
