@@ -1,8 +1,7 @@
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, ScanCommand, GetCommand, BatchGetCommand } from "@aws-sdk/lib-dynamodb";
+import {Client } from "@aws-sdk/client-dynamodb";
+import { Client, ScanCommand, GetCommand, BatchGetCommand } from "@aws-sdk/lib-dynamodb";
 
-const client = new DynamoDBClient({});
-const ddb = DynamoDBDocumentClient.from(client);
+
 const TABLE_NAME = " Bonzai-BonzaiHotell";
 
 // Helper: Validate booking
