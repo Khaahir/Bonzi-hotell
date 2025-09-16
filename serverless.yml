@@ -49,12 +49,12 @@ resources:
         TableName: Bonzai-BonzaiHotell
         BillingMode: PAY_PER_REQUEST
         AttributeDefinitions:
-          - AttributeName: pk
+          - AttributeName: PK
             AttributeType: S
-          - AttributeName: sk
+          - AttributeName: SK
             AttributeType: S
         KeySchema:
-          - AttributeName: pk
+          - AttributeName: PK
             KeyType: HASH          # partition key
-          - AttributeName: sk
+          - AttributeName: SK
             KeyType: RANGE    
