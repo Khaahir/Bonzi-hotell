@@ -1,59 +1,75 @@
+// functions/AllBooking/index.mjs
+import { DynamoDBDocumentClient, ScanCommand, GetCommand } from "@aws-sdk/lib-dynamodb";
 import { client } from "../../service/db.mjs";
-import { ScanCommand, GetCommand, BatchGetCommand } from "@aws-sdk/lib-dynamodb";
 
 const ddb = DynamoDBDocumentClient.from(client);
-const TABLE_NAME = "Bonzai-BonzaiHotell";
+const TABLE_NAME = process.env.TABLE_NAME;
 
-// Helper: Validate booking
-async function validateBooking(booking) {
-  const roomKeys = booking.RoomIDs.map(id => ({ PK: id, SK: "METADATA" }));
+const ROOM_CAPACITY = { single: 1, double: 2, suite: 3 };
 
-  const roomData = await ddb.send(new BatchGetCommand({
-    RequestItems: {
-      [TABLE_NAME]: {
-        Keys: roomKeys
-      }
-    }
-  }));
+const respond = (code, data) => ({
+  statusCode: code,
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(data),
+});
 
-  const rooms = roomData.Responses[TABLE_NAME];
-  const totalCapacity = rooms.reduce((sum, room) => sum + room.Capacity, 0);
+// Validate capacity using rooms array from booking item
+function normalizeAndValidate(booking) {
+  const rooms = Array.isArray(booking.rooms) ? booking.rooms : [];
+  const guests =
+    typeof booking.guests === "number" ? booking.guests : Number(booking.guests);
 
-  if (totalCapacity !== booking.GuestCount) {
-    throw new Error(`Booking ${booking.PK} is invalid: guest count (${booking.GuestCount}) ≠ room capacity (${totalCapacity})`);
+  const totalCapacity = rooms.reduce(
+    (sum, type) => sum + (ROOM_CAPACITY[type] || 0),
+    0
+  );
+
+  return {
+    ...booking,
+    totalCapacity,
+    valid: Number.isFinite(guests) && totalCapacity === guests,
+  };
+}
+
+// GET /see → list all bookings
+export const getAllBookings = async () => {
+  try {
+    const out = await ddb.send(
+      new ScanCommand({
+        TableName: TABLE_NAME,
+        // filter on the actual field you save: entityType = "BOOKING"
+        FilterExpression: "#et = :t",
+        ExpressionAttributeNames: { "#et": "entityType" },
+        ExpressionAttributeValues: { ":t": "BOOKING" },
+      })
+    );
+
+    const items = (out.Items || []).map(normalizeAndValidate);
+    return respond(200, { count: items.length, items });
+  } catch (err) {
+    console.error("getAllBookings error:", err);
+    return respond(500, { message: err.message || "internal error" });
   }
+};
 
-  return { ...booking, Rooms: rooms, valid: true };
-}
+// (Optional) GET /bookings/{id} if you add such a route later
+export const getBookingById = async (event) => {
+  try {
+    const id = event?.pathParameters?.id;
+    if (!id) return respond(400, { message: "Missing path param: id" });
 
-// Get all bookings
-export async function getAllBookings() {
-  const result = await ddb.send(new ScanCommand({
-    TableName: TABLE_NAME,
-    FilterExpression: "#type = :bookingType",
-    ExpressionAttributeNames: { "#type": "Type" },
-    ExpressionAttributeValues: { ":bookingType": "Booking" }
-  }));
+    const out = await ddb.send(
+      new GetCommand({
+        TableName: TABLE_NAME,
+        Key: { PK: `BOOKING#${id}`, SK: "METADATA" },
+      })
+    );
 
-  const bookings = await Promise.all(result.Items.map(async booking => {
-    try {
-      return await validateBooking(booking);
-    } catch (err) {
-      return { ...booking, valid: false, error: err.message };
-    }
-  }));
+    if (!out.Item) return respond(404, { message: `Booking ${id} not found` });
 
-  return bookings;
-}
-
-// Get one booking by ID
-export async function getBookingById(id) {
-  const result = await ddb.send(new GetCommand({
-    TableName: TABLE_NAME,
-    Key: { PK: `BOOKING#${id}`, SK: "METADATA" }
-  }));
-
-  if (!result.Item) throw new Error(`Booking ${id} not found`);
-
-  return await validateBooking(result.Item);
-}
+    return respond(200, normalizeAndValidate(out.Item));
+  } catch (err) {
+    console.error("getBookingById error:", err);
+    return respond(500, { message: err.message || "internal error" });
+  }
+};
