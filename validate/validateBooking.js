@@ -1,5 +1,5 @@
 const CAPACITY = { single: 1, double: 2, suite: 3 };
-const ALLOWED_ROOM_TYPES = new Set(Object.keys(capacity));
+const ALLOWED_ROOM_TYPES = new Set(Object.keys(CAPACITY));
 
 export const validateBody = (request) => {
   if (!request || typeof request !== "object" || Array.isArray(request)) {
@@ -19,7 +19,7 @@ export const validateBody = (request) => {
   if (!Array.isArray(rooms) || rooms.length === 0) {
     return {
       statusCode: 400,
-      message: "romms måste fyllas i!",
+      message: "rooms måste fyllas i!",
     };
   }
 
@@ -48,6 +48,7 @@ export const validateBody = (request) => {
     };
   }
   return {
+    ok: true,
     statusCode: 200,
     message: "Bokning lyckades",
   };
