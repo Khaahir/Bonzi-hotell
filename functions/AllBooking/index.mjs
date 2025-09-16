@@ -1,8 +1,8 @@
 import { client } from "../../service/db.mjs";
-import { Client, ScanCommand, GetCommand, BatchGetCommand } from "@aws-sdk/lib-dynamodb";
+import { ScanCommand, GetCommand, BatchGetCommand } from "@aws-sdk/lib-dynamodb";
 
-
-const TABLE_NAME = " Bonzai-BonzaiHotell";
+const ddb = DynamoDBDocumentClient.from(client);
+const TABLE_NAME = "Bonzai-BonzaiHotell";
 
 // Helper: Validate booking
 async function validateBooking(booking) {
