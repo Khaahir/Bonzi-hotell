@@ -6,23 +6,23 @@ provider:
   runtime: nodejs20.x
   region: eu-north-1
   stage: dev
+  role: arn:aws:iam::435830281389:role/LamndaAccses
 
   environment:
     TABLE_NAME: ${self:service}-${sls:stage}-main
+    AWS_NODEJS_CONNECTION_REUSE_ENABLED: "1"
 
-  iam:
-    role:
-      statements:
-        - Effect: Allow
-          Action:
-            - dynamodb:PutItem
-            - dynamodb:GetItem
-            - dynamodb:Scan
-            - dynamodb:Query
-            - dynamodb:UpdateItem
-            - dynamodb:DeleteItem
-          Resource:
-            - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${self:provider.environment.TABLE_NAME}
+
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:PutItem
+        - dynamodb:GetItem
+        - dynamodb:Query
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource:
+        - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${self:provider.environment.TABLE_NAME}
 
 functions:
   AddRoom:

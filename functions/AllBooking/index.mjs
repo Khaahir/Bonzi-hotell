@@ -1,5 +1,5 @@
 // functions/AllBooking/index.mjs
-import { DynamoDBDocumentClient, ScanCommand, GetCommand } from "@aws-sdk/lib-dynamodb";
+import { DynamoDBDocumentClient, QueryCommand, GetCommand } from "@aws-sdk/lib-dynamodb";
 import { client } from "../../service/db.mjs";
 
 const ddb = DynamoDBDocumentClient.from(client);
@@ -35,7 +35,7 @@ function normalizeAndValidate(booking) {
 export const getAllBookings = async () => {
   try {
     const out = await ddb.send(
-      new ScanCommand({
+      new QueryCommand({
         TableName: TABLE_NAME,
         // filter on the actual field you save: entityType = "BOOKING"
         FilterExpression: "#et = :t",
