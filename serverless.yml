@@ -1,15 +1,28 @@
-# "org" ensures this Service is used with the correct Serverless Framework Access Key.
 org: js24jesp
-# "service" is the name of this project. This will also be added to your AWS resource names.
 service: BonzaiHotell
 
 provider:
   name: aws
   runtime: nodejs20.x
   region: eu-north-1
-  # Uncomment to easily set up a custom domain. Read the docs for more details:
-  # https://www.serverless.com/framework/docs/providers/aws/guide/domains
-  # domain: api.example.com
+  stage: dev
+
+  environment:
+    TABLE_NAME: ${self:service}-${sls:stage}-main
+
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:PutItem
+            - dynamodb:GetItem
+            - dynamodb:Scan
+            - dynamodb:Query
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource:
+            - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${self:provider.environment.TABLE_NAME}
 
 functions:
   AddRoom:
@@ -38,15 +51,14 @@ functions:
     events:
       - httpApi:
           path: /see
-          method: get      
-
+          method: get
 
 resources:
   Resources:
-    Js24Todo:
+    BookingTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: Bonzai-BonzaiHotell
+        TableName: ${self:provider.environment.TABLE_NAME}
         BillingMode: PAY_PER_REQUEST
         AttributeDefinitions:
           - AttributeName: PK
@@ -55,6 +67,6 @@ resources:
             AttributeType: S
         KeySchema:
           - AttributeName: PK
-            KeyType: HASH          # partition key
+            KeyType: HASH
           - AttributeName: SK
-            KeyType: RANGE    
+            KeyType: RANGE

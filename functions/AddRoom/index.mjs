@@ -1,11 +1,9 @@
 import { v4 as uuid } from "uuid";
 import { validateBody } from "../../validate/validateBooking";
-import { PutItemCommand } from "@aws-sdk/client-dynamodb"
+import { PutItemCommand } from "@aws-sdk/client-dynamodb";
 import { client } from "../../service/db.mjs";
 
-
-
-const TABLE_NAME = "Bonzai-BonzaiHotell"; // hämta rätt table name från serverless filen ? 
+const TABLE_NAME = process.env.TABLE_NAME;
 
 const price = { single: 500, double: 1000, suite: 1500 };
 
@@ -18,7 +16,6 @@ const respond = (code, data) => ({
 const calcTotalPrice = (rooms) =>
   rooms.reduce((acc, type) => acc + price[type], 0);
 
-// Kvitto
 const receipt = (rooms) => {
   const counts = rooms.reduce((acc, room) => {
     acc[room] = (acc[room] || 0) + 1;
@@ -34,23 +31,22 @@ const receipt = (rooms) => {
   });
 };
 
-
 export const handler = async (event) => {
   try {
     const body = JSON.parse(event.body || "{}");
-    const validate = validateBody(body)
-    if(!validate.ok) return respond(validate.statusCode, { message: validate.message })
+    const validate = validateBody(body);
+    if (!validate.ok)
+      return respond(validate.statusCode, { message: validate.message });
 
-    const  { guests, rooms, customer } = body
+    const { guests, rooms, customer } = body;
 
     const totalPrice = calcTotalPrice(rooms);
-
     const id = uuid();
     const now = new Date().toISOString();
 
-  const bookingItem = {
+    const bookingItem = {
       PK: { S: `BOOKING#${id}` },
-      SK: { S: `METADATA` }, // måste byta namn här. vad ska vara sort key???
+      SK: { S: "METADATA" }, // it's fine to keep "METADATA" for the main record
       entityType: { S: "BOOKING" },
       id: { S: id },
       createdAt: { S: now },
@@ -58,50 +54,56 @@ export const handler = async (event) => {
       rooms: { L: rooms.map((r) => ({ S: r })) },
       totalPrice: { N: String(totalPrice) },
       ...(customer && {
-  customer: {
-    M: Object.fromEntries(
-      Object.entries(customer).map(([k, v]) => [k, { S: String(v) }])
-    )
-  }
-})
-  }
-   
+        customer: {
+          M: Object.fromEntries(
+            Object.entries(customer).map(([k, v]) => [k, { S: String(v) }])
+          ),
+        },
+      }),
+    };
+
     const indexItem = {
-        PK: { S: "BOOKING#INDEX" },
-        SK: { S: `BOOKING#${id}` },
-        entityType: { S: "BOOKING_INDEX" },
-        id: { S: id },
-        createdAt: { S: now },
-        guests: { N: String(guests) },
-        totalPrice: { N: String(totalPrice)}
-    }
+      PK: { S: "BOOKING#INDEX" },
+      SK: { S: `BOOKING#${id}` },
+      entityType: { S: "BOOKING_INDEX" },
+      id: { S: id },
+      createdAt: { S: now },
+      guests: { N: String(guests) },
+      totalPrice: { N: String(totalPrice) },
+    };
 
-    await client.send(new PutItemCommand({
-        tableName: TABLE_NAME,
+    await client.send(
+      new PutItemCommand({
+        TableName: TABLE_NAME, 
         Item: bookingItem,
-        ConditionExpression: "attribute_not_exists(PK)"
-    }))
-    
-    await client.send(new PutItemCommand({
-        tableName: TABLE_NAME,
-        Item: indexItem
-    }))
+        ConditionExpression: "attribute_not_exists(PK)",
+      })
+    );
 
-    return respond(201,{
-    id,
-    createdAt: now,
-    guests: body.guests,
-    rooms,
-    totalPrice,
-    customer: body.customer,
-    confirmation: {
+    await client.send(
+      new PutItemCommand({
+        TableName: TABLE_NAME,
+        Item: indexItem,
+      })
+    );
+
+    return respond(201, {
+      id,
+      createdAt: now,
+      guests,
+      rooms,
+      totalPrice,
+      customer,
+      confirmation: {
         currency: "SEK",
         items: receipt(rooms),
-        total: totalPrice
-    }
-        })
-
+        total: totalPrice,
+      },
+    });
   } catch (err) {
-    return respond(err.statusCode || 500, { message: err.message || "internt fel" })
+    console.error("AddRoom error:", err);
+    return respond(err.statusCode || 500, {
+      message: err.message || "internal error",
+    });
   }
 };
