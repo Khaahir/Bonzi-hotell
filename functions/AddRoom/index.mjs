@@ -37,11 +37,12 @@ export const handler = async (event) => {
     if (!validate.ok)
       return respond(validate.statusCode, { message: validate.message });
 
-    const { id, guests, rooms, customer } = body; // 👈 now expecting id from client
-
-    if (!id) {
+    const { /* id */ guests, rooms, customer } = body; // 👈 now expecting id from client
+    
+    // id ska inte skickas med i post , id får vi tillbaka från posten
+    /* if (!id) { 
       return respond(400, { message: "Booking id is required" });
-    }
+    } */
 
     const totalPrice = calcTotalPrice(rooms);
     const now = new Date().toISOString();
