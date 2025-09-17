@@ -5,6 +5,7 @@
 
 const CAPACITY = { single: 1, double: 2, suite: 3 };
 const ALLOWED_ROOM_TYPES = new Set(Object.keys(CAPACITY));
+const MAX_ROOMS = 20
 
 export const validateBody = (request) => {
   if (!request || typeof request !== "object" || Array.isArray(request)) {
@@ -13,6 +14,7 @@ export const validateBody = (request) => {
       message: "Body måste vara ett JSON-object",
     };
   }
+  
   const { guests, rooms, customer } = request;
 
   if (!Number.isInteger(guests) || guests < 1) {
@@ -26,6 +28,14 @@ export const validateBody = (request) => {
       statusCode: 400,
       message: "rooms måste fyllas i!",
     };
+  }
+
+  if(rooms.length > MAX_ROOMS) {
+    return {
+        ok:false,
+        statusCode:400,
+        message:`Du kan max boka ${MAX_ROOMS} rum`
+    }
   }
 
   for (const roomType of rooms) {
