@@ -23,7 +23,7 @@ const receipt = (rooms) => {
   return Object.entries(counts).map(([type, count]) => {
     const unitPrice = price[type];
     return {
-      label: `${type} × ${count}`,
+      roomType: `${type} × ${count}`,
       unitPrice,
       subtotal: unitPrice * count,
     };
