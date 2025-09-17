@@ -24,9 +24,9 @@ export const handler = async (event) => {
     const body = JSON.parse(event.body || "{}");
     const { id, guests, rooms, customer } = body;
 
-    if (!id) return respond(400, { message: "Booking id is required" });
+    if (!id) return respond(400, { message: "Boknings-ID måste anges" });
     if (guests === undefined && rooms === undefined && customer === undefined) {
-      return respond(400, { message: "Nothing to update" });
+      return respond(400, { message: "Inget att uppdatera" });
     }
 
     const currentRes = await client.send(
@@ -36,14 +36,14 @@ export const handler = async (event) => {
         ConsistentRead: true,
       })
     );
-    if (!currentRes.Item) return respond(404, { message: "Booking not found" });
+    if (!currentRes.Item) return respond(404, { message: "Bokningen finns inte" });
 
     const current = fromAttr(currentRes.Item);
     const effectiveGuests = guests ?? current.guests;
     const effectiveRooms = rooms ?? current.rooms;
 
     if (effectiveGuests === undefined || !Array.isArray(effectiveRooms) || effectiveRooms.length === 0) {
-      return respond(400, { message: "Guests and rooms must be set (either existing or in request)" });
+      return respond(400, { message: "Antal gäster och rum måste vara satta (antingen befintliga eller i requesten)" });
     }
 
     const validation = validateBody({
@@ -119,7 +119,7 @@ export const handler = async (event) => {
       customer: customer ?? undefined,
     });
   } catch (err) {
-    console.error("PatchBooking error:", err);
-    return respond(err.statusCode || 500, { message: err.message || "internal error" });
+    console.error("PatchBooking fel:", err);
+    return respond(err.statusCode || 500, { message: err.message || "Internt fel" });
   }
 };

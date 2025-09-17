@@ -29,7 +29,7 @@ functions:
     events:
       - httpApi:
           path: /change
-          method: put
+          method: patch
 
   AllBooking:
     handler: functions/AllBooking/index.getAllBookings
