@@ -5,6 +5,7 @@
 
 const CAPACITY = { single: 1, double: 2, suite: 3 };
 const ALLOWED_ROOM_TYPES = new Set(Object.keys(CAPACITY));
+const ROOM_LIMIT = 20
 
 export const validateBody = (request) => {
   if (!request || typeof request !== "object" || Array.isArray(request)) {
@@ -13,6 +14,7 @@ export const validateBody = (request) => {
       message: "Body måste vara ett JSON-object",
     };
   }
+  
   const { guests, rooms, customer } = request;
 
   if (!Number.isInteger(guests) || guests < 1) {
@@ -26,6 +28,14 @@ export const validateBody = (request) => {
       statusCode: 400,
       message: "rooms måste fyllas i!",
     };
+  }
+
+  if(rooms.length > ROOM_LIMIT) {
+    return {
+        ok:false,
+        statusCode:400,
+        message:`Du kan max boka ${ROOM_LIMIT} rum`
+    }
   }
 
   for (const roomType of rooms) {
@@ -46,7 +56,7 @@ export const validateBody = (request) => {
     (sum, roomType) => sum + CAPACITY[roomType],
     0
   );
-  if (totalBeds !== guests) {
+  if (totalBeds < guests) {
     return {
       statusCode: 400,
       message: `Bäddar (${totalBeds}) matchar inte antal gäster (${guests}).`,
