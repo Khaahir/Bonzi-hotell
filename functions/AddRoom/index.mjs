@@ -94,7 +94,6 @@ export const handler = async (event) => {
       createdAt: now,
       guests,
       rooms,
-      totalPrice,
       customer,
       confirmation: {
         currency: "SEK",
