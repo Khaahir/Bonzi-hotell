@@ -5,7 +5,7 @@
 
 const CAPACITY = { single: 1, double: 2, suite: 3 };
 const ALLOWED_ROOM_TYPES = new Set(Object.keys(CAPACITY));
-const MAX_ROOMS = 20
+const ROOM_LIMIT = 20
 
 export const validateBody = (request) => {
   if (!request || typeof request !== "object" || Array.isArray(request)) {
@@ -30,11 +30,11 @@ export const validateBody = (request) => {
     };
   }
 
-  if(rooms.length > MAX_ROOMS) {
+  if(rooms.length > ROOM_LIMIT) {
     return {
         ok:false,
         statusCode:400,
-        message:`Du kan max boka ${MAX_ROOMS} rum`
+        message:`Du kan max boka ${ROOM_LIMIT} rum`
     }
   }
 
