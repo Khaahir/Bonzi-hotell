@@ -5,21 +5,46 @@ const ddb = DynamoDBDocumentClient.from(client);
 const TABLE_NAME = "BonzaiHotell";
 
 export async function handler(event) {
-  const id = event?.pathParameters?.id; // or switch to query if that's your route
-  if (!id) return { statusCode: 400, body: JSON.stringify({ message: "Booking ID is required" }) };
+  let bookingId;
+
+  // Parse body safely
+  if (event?.body) {
+    try {
+      const data = JSON.parse(event.body);
+      bookingId = data?.bookingId;
+    } catch (e) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ message: "Invalid JSON body" }),
+      };
+    }
+  }
+
+  if (!bookingId) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ message: "Booking ID is required" }),
+    };
+  }
 
   const params = {
     TableName: TABLE_NAME,
-    Key: { PK: `BOOKING#${id}`, SK: "METADATA" },
+    Key: { PK: `BOOKING#${bookingId}`, SK: "METADATA" },
     ConditionExpression: "attribute_exists(PK) AND attribute_exists(SK)",
     ReturnValues: "ALL_OLD",
   };
 
   try {
     const result = await ddb.send(new DeleteCommand(params));
-    return { statusCode: 200, body: JSON.stringify({ message: "Booking deleted", booking: result.Attributes ?? null }) };
+    return {
+      statusCode: 200,
+      body: JSON.stringify({
+        message: "Booking deleted",
+        booking: result.Attributes ?? null,
+      }),
+    };
   } catch (err) {
-    console.error("Delete failed", { err, event }); // check CloudWatch
+    console.error("Delete failed", { err, event });
     if (err.name === "ConditionalCheckFailedException") {
       return { statusCode: 404, body: JSON.stringify({ message: "Booking not found" }) };
     }
