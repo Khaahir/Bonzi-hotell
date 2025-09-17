@@ -46,7 +46,7 @@ export const validateBody = (request) => {
     (sum, roomType) => sum + CAPACITY[roomType],
     0
   );
-  if (totalBeds !== guests) {
+  if (totalBeds < guests) {
     return {
       statusCode: 400,
       message: `Bäddar (${totalBeds}) matchar inte antal gäster (${guests}).`,
