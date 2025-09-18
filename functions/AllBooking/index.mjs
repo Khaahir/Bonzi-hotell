@@ -25,7 +25,7 @@ function normalizeAndValidate(booking) {
   return {
     ...booking,
     totalCapacity,
-    valid: Number.isFinite(guests) && totalCapacity === guests,
+    RooomFull: Number.isFinite(guests) && totalCapacity === guests,
   };
 }
 
