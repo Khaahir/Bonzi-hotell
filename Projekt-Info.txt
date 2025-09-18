@@ -73,7 +73,7 @@ User stories nedbrutna till tasks
 
 5. Se alla bokningar
 • Skapa GET /bookings
-• Hämta alla bokningar från Dyn
+• Hämta alla bokningar från DynamoDB
 
 
 
@@ -98,4 +98,4 @@ Onsdag: började närma oss slutet av projektet
 Torsdag: samlas o gå igenom uppfigten så ingenting är missast samt spela in video 
 
 
-Fredag:
+Fredag: lämnade in uppgifter....
