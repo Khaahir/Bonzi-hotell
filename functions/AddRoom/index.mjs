@@ -39,7 +39,7 @@ export const handler = async (event) => {
     if (!validate.ok)
       return respond(validate.statusCode, { message: validate.message });
 
-    const { guests, rooms, customer } = body;
+    const { guests, rooms, customer, checkIn, checkOut } = body;
     const id = uuidv4()
     const totalPrice = calcTotalPrice(rooms);
     const now = new Date().toISOString();
@@ -53,6 +53,8 @@ export const handler = async (event) => {
       createdAt: { S: now },
       guests: { N: String(guests) },
       rooms: { L: rooms.map((r) => ({ S: r })) },
+      checkIn: { S: checkIn },
+      checkOut: { S: checkOut},
       totalPrice: { N: String(totalPrice) },
       ...(customer && {
         customer: {
@@ -70,6 +72,8 @@ export const handler = async (event) => {
       id: { S: id },
       createdAt: { S: now },
       guests: { N: String(guests) },
+      checkIn: { S: checkIn },
+      checkOut: { S: checkOut },
       totalPrice: { N: String(totalPrice) },
     };
 
@@ -94,6 +98,8 @@ export const handler = async (event) => {
       guests,
       rooms,
       customer,
+      checkIn,
+      checkOut,
       confirmation: {
         currency: "SEK",
         items: receipt(rooms),
