@@ -15,7 +15,7 @@ export const validateBody = (request) => {
     };
   }
   
-  const { guests, rooms, customer } = request;
+  const { guests, rooms, customer, checkIn, checkOut } = request;
 
   if (!Number.isInteger(guests) || guests < 1) {
     return {
@@ -61,6 +61,42 @@ export const validateBody = (request) => {
       statusCode: 400,
       message: `Bäddar (${totalBeds}) matchar inte antal gäster (${guests}).`,
     };
+  }
+
+  if (
+    !customer ||
+    typeof customer !== "object" ||
+    typeof customer.name !== "string" ||
+    typeof customer.email !== "string"
+  ) {
+    return {
+        statusCode: 400,
+        message: "Customer måste innehålla name och email as string"
+    }
+  }
+
+  const checkInDate = new Date(checkIn)
+  const checkoutDate = new Date(checkOut)
+
+  if (isNaN(checkInDate.getTime()) || isNaN(checkoutDate.getTime())) {
+    return {
+        statusCode: 400,
+        message: "checkIn och checkOut måste vara giltiga datumsträngar"
+    }
+  }
+  
+  if (typeof checkIn !== "string" || typeof checkOut !== "string") {
+  return {
+    statusCode: 400,
+    message: "checkIn och checkOut måste vara datumsträngar",
+  };
+}
+
+  if (checkoutDate <= checkInDate) {
+    return {
+        statusCode: 400,
+        message: "checkOut måste vara efter checkIn"
+    }
   }
   return {
     ok: true,
