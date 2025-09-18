@@ -40,11 +40,11 @@ export const handler = async (event) => {
       return respond(validate.statusCode, { message: validate.message });
 
     const { guests, rooms, customer } = body;
-
+    const id = uuidv4()
     const totalPrice = calcTotalPrice(rooms);
     const now = new Date().toISOString();
-    const id = uuidv4()
     
+
     const bookingItem = {
       PK: { S: `BOOKING#${id}` },
       SK: { S: "METADATA" },
