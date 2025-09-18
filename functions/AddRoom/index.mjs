@@ -1,6 +1,8 @@
 import { validateBody } from "../../validate/validateBooking.js";
 import { PutItemCommand } from "@aws-sdk/client-dynamodb";
 import { client } from "../../service/db.mjs";
+import { v4 as uuidv4 } from "uuid"
+
 
 const TABLE_NAME = "BonzaiHotell";
 
@@ -41,7 +43,8 @@ export const handler = async (event) => {
 
     const totalPrice = calcTotalPrice(rooms);
     const now = new Date().toISOString();
-
+    const id = uuidv4()
+    
     const bookingItem = {
       PK: { S: `BOOKING#${id}` },
       SK: { S: "METADATA" },
