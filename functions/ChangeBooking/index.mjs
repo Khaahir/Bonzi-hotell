@@ -1,3 +1,4 @@
+// +++ Nya rader markerade med kommentarer +++
 import { GetItemCommand, UpdateItemCommand } from "@aws-sdk/client-dynamodb";
 import { validateBody } from "../../validate/validateBooking.js";
 import { client } from "../../service/db.mjs";
@@ -17,15 +18,26 @@ const fromAttr = (item) => ({
   id: item?.id?.S,
   guests: item?.guests?.N ? Number(item.guests.N) : undefined,
   rooms: Array.isArray(item?.rooms?.L) ? item.rooms.L.map((x) => x.S) : [],
+  // +++
+  checkIn: item?.checkIn?.S,
+  checkOut: item?.checkOut?.S,
 });
 
 export const handler = async (event) => {
   try {
     const body = JSON.parse(event.body || "{}");
-    const { id, guests, rooms, customer } = body;
+    // +++
+    const { id, guests, rooms, customer, checkIn, checkOut } = body;
 
     if (!id) return respond(400, { message: "Boknings-ID måste anges" });
-    if (guests === undefined && rooms === undefined && customer === undefined) {
+    if (
+      guests === undefined &&
+      rooms === undefined &&
+      customer === undefined &&
+      // +++
+      checkIn === undefined &&
+      checkOut === undefined
+    ) {
       return respond(400, { message: "Inget att uppdatera" });
     }
 
@@ -41,15 +53,28 @@ export const handler = async (event) => {
     const current = fromAttr(currentRes.Item);
     const effectiveGuests = guests ?? current.guests;
     const effectiveRooms = rooms ?? current.rooms;
+    // +++
+    const effectiveCheckIn = checkIn ?? current.checkIn;
+    const effectiveCheckOut = checkOut ?? current.checkOut;
 
-    if (effectiveGuests === undefined || !Array.isArray(effectiveRooms) || effectiveRooms.length === 0) {
-      return respond(400, { message: "Antal gäster och rum måste vara satta (antingen befintliga eller i requesten)" });
+    if (
+      effectiveGuests === undefined ||
+      !Array.isArray(effectiveRooms) ||
+      effectiveRooms.length === 0
+    ) {
+      return respond(400, {
+        message:
+          "Antal gäster och rum måste vara satta (antingen befintliga eller i requesten)",
+      });
     }
 
+    // +++ Skicka med datumen till valideringen
     const validation = validateBody({
       guests: effectiveGuests,
       rooms: effectiveRooms,
       customer: customer ?? {},
+      checkIn: effectiveCheckIn,
+      checkOut: effectiveCheckOut,
     });
     if (!validation.ok) {
       return respond(validation.statusCode, { message: validation.message });
@@ -72,10 +97,24 @@ export const handler = async (event) => {
       values[":rooms"] = { L: rooms.map((r) => ({ S: r })) };
       sets.push("#rooms = :rooms");
     }
+    // +++ Uppdatera datum om de skickas in
+    if (checkIn !== undefined) {
+      names["#checkIn"] = "checkIn";
+      values[":checkIn"] = { S: String(checkIn) };
+      sets.push("#checkIn = :checkIn");
+    }
+    if (checkOut !== undefined) {
+      names["#checkOut"] = "checkOut";
+      values[":checkOut"] = { S: String(checkOut) };
+      sets.push("#checkOut = :checkOut");
+    }
+
     if (customer && typeof customer === "object") {
       names["#customer"] = "customer";
       values[":customer"] = {
-        M: Object.fromEntries(Object.entries(customer).map(([k, v]) => [k, { S: String(v) }])),
+        M: Object.fromEntries(
+          Object.entries(customer).map(([k, v]) => [k, { S: String(v) }])
+        ),
       };
       sets.push("#customer = :customer");
     }
@@ -116,6 +155,9 @@ export const handler = async (event) => {
       guests: effectiveGuests,
       rooms: effectiveRooms,
       totalPrice: newTotalPrice,
+      // +++
+      checkIn: effectiveCheckIn,
+      checkOut: effectiveCheckOut,
       customer: customer ?? undefined,
     });
   } catch (err) {
