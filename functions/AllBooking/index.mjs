@@ -42,23 +42,57 @@ export const getAllBookings = async () => {
     );
 
     const items = (out.Items || []).map(normalizeAndValidate);
-	//Summera antal rum per typ
-const roomStats = items.reduce((acc, booking) => {
-      booking.rooms.forEach((roomType) => {
-        acc[roomType] = (acc[roomType] || 0) + 1;
-		acc.totalRoomsBooked = (acc.totalRoomsBooked || 0) + 1;
-      });
-      return acc;
-    }, {});
+// Först räkna rumstyper och total
+    const roomCounts = {};
+    let totalRoomsBooked = 0;
 
-	return respond(200, {
-		count:items.length,
-		roomStats, // Beläggning per rumstyp samt totalt antal bokade rum
-		items, // Alla bokningar
-	});
-	} catch (err) {
+    items.forEach((booking) => {
+      booking.rooms.forEach((roomType) => {
+        roomCounts[roomType] = (roomCounts[roomType] || 0) + 1;
+        totalRoomsBooked += 1;
+      });
+    });
+// roomStats med totalRoomsBooked
+    const roomStats = {
+      ...roomCounts,
+      totalRoomsBooked, 
+    };
+
+    return respond(200, {
+      count: items.length,
+      roomStats,
+      items,
+    });
+  } catch (err) {
     console.error("getAllBookings error:", err);
     return respond(500, { message: err.message || "internal error" });
   }
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
