@@ -46,13 +46,14 @@ export const getAllBookings = async () => {
 const roomStats = items.reduce((acc, booking) => {
       booking.rooms.forEach((roomType) => {
         acc[roomType] = (acc[roomType] || 0) + 1;
+		acc.totalRoomsBooked = (acc.totalRoomsBooked || 0) + 1;
       });
       return acc;
     }, {});
 
 	return respond(200, {
 		count:items.length,
-		roomStats, // Beläggning per rumstyp
+		roomStats, // Beläggning per rumstyp samt totalt antal bokade rum
 		items, // Alla bokningar
 	});
 	} catch (err) {
