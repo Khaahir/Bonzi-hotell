@@ -84,6 +84,8 @@ ROBIN arbetar med ADDROOM function
 JESPER arbetar med serverless & CANCELBOOKING
 
 
+OBS... vi har arbetat mycket ihop där av mycket push o pull from jesper's sida
+
 Vad har vi gjort?
 
 Måndag: samlades,  skaffa en struktur för projektet samt tog på oss uppgifter för dagen
