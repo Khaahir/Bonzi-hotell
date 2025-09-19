@@ -43,14 +43,15 @@ export const handler = async (event) => {
     const id = uuidv4()
     const totalPrice = calcTotalPrice(rooms);
     const now = new Date().toISOString();
-    
+    const createdDate = now.slice(0, 10);
+  
 
     const bookingItem = {
       PK: { S: `BOOKING#${id}` },
       SK: { S: "METADATA" },
       entityType: { S: "BOOKING" },
       id: { S: id },
-      createdAt: { S: now },
+      createdAt: { S: createdDate },
       guests: { N: String(guests) },
       rooms: { L: rooms.map((r) => ({ S: r })) },
       checkIn: { S: checkIn },
